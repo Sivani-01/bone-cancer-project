@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI | Bone Tumor Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-sidebar { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 flex h-screen overflow-hidden">
+
+    <aside class="w-72 glass-sidebar text-white p-8 flex flex-col shadow-2xl">
+        <div class="mb-12">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="flex items-center justify-center w-12 h-12 overflow-hidden rounded-lg shadow-md border border-slate-700">
+                    <img src="{{ url_for('static', filename='sashi-logo.png') }}" 
+                         alt="Sashi Logo" 
+                         class="w-full h-full object-cover">
+                </div>
+                <h1 class="text-xl font-bold tracking-tight">Sashi</h1>
+            </div>
+            <p class="text-xs text-slate-400 leading-relaxed uppercase tracking-widest font-semibold">Diagnostic Intelligence</p>
+        </div>
+
+        <nav class="space-y-2 flex-1">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3 p-3 rounded-xl bg-blue-600 shadow-lg text-white font-medium">
+                <i class="ph ph-activity text-lg"></i> Run Analysis
+            </a>
+            
+            <a href="{{ url_for('history') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-folder-open text-lg"></i> Patient History
+            </a>
+            
+            <a href="{{ url_for('performance') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-chart-line-up text-lg"></i> Model Performance
+            </a>
+
+            <a href="{{ url_for('insights') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-lightbulb text-lg"></i> Insights
+            </a>
+        </nav>
+        
+        <div class="mt-auto space-y-4">
+            <div class="bg-slate-800/50 p-4 rounded-xl border border-slate-700/50">
+                <p class="text-[10px] text-slate-500 mb-1">DATA SECURITY</p>
+                <div class="flex items-center gap-2 text-xs text-slate-300">
+                    <i class="ph ph-shield-check text-green-400"></i> HIPAA Compliant
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="flex-1 p-10 overflow-y-auto flex flex-col">
+        <div class="max-w-5xl mx-auto w-full flex-1">
+            
+            <header class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Tumor Assessment Portal</h2>
+                    <p class="text-slate-500 mt-1">Input patient metadata to generate neural prognostic insights.</p>
+                </div>
+                <div class="text-right">
+                    <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase">Active Session</span>
+                </div>
+            </header>
+
+            {% if error %}
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-8 rounded-r-xl">
+                <div class="flex items-center">
+                    <i class="ph ph-warning-circle text-red-500 text-xl mr-3"></i>
+                    <p class="text-red-700 text-sm font-medium">{{ error }}</p>
+                </div>
+            </div>
+            {% endif %}
+
+            <form action="{{ url_for('predict') }}" method="POST" class="space-y-8 pb-12" id="analysisForm">
+                
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="ph ph-user-circle"></i> Demographics
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Patient Full Name</label>
+                            <input type="text" name="name" placeholder="John Doe" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Age (Years)</label>
+                            <input type="number" name="Age" placeholder="28" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 transition outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-2">Biological Sex</label>
+                            <select name="Sex" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none">
+                                <option>Male</option>
+                                <option>Female</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="ph ph-microscope"></i> Pathological Profile
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                        
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2 flex items-center gap-2 group-focus-within:text-blue-600 transition">
+                                Grade 
+                                <span class="group/tip relative cursor-help">
+                                    <i class="ph ph-info text-slate-400"></i>
+                                    <div class="absolute hidden group-hover/tip:block bg-slate-800 text-white text-[10px] p-2 rounded-lg w-48 z-20 -top-12 left-6 shadow-xl leading-tight normal-case font-normal">
+                                        Histological grade based on FNCLCC criteria (differentiation, mitosis, necrosis).
+                                    </div>
+                                </span>
+                            </label>
+                            <select name="Grade" required 
+                                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-300 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                                <option value="" disabled selected>Select Grade...</option>
+                                {% for val in categories['Grade'] %}
+                                <option value="{{ val }}">{{ val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        {% for col, values in categories.items() %}
+                        {% if col not in ['Sex', 'Age', 'Grade', 'Patient ID', 'Status (NED, AWD, D)'] %}
+                        <div class="group">
+                            <label class="block text-sm font-semibold text-slate-700 mb-2 group-focus-within:text-blue-600 transition">{{ col }}</label>
+                            <select name="{{ col }}" required 
+                                class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl shadow-sm hover:border-blue-300 focus:ring-2 focus:ring-blue-500 outline-none transition">
+                                <option value="" disabled selected>Select {{ col }}...</option>
+                                {% for val in values %}
+                                <option value="{{ val }}">{{ val }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-6">
+                    <div class="flex items-center gap-4 text-slate-400 text-sm">
+                        <i class="ph ph-info text-xl"></i>
+                        <span>Model will calculate survival probability & treatment efficacy.</span>
+                    </div>
+                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-2xl font-bold shadow-xl shadow-blue-200 flex items-center gap-3 transform active:scale-95 transition">
+                        Run Neural Analysis <i class="ph ph-lightning-fill"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <footer class="mt-auto bg-[#0f172a] text-slate-400 py-4 px-10 -mx-10 -mb-10 shadow-[0_-10px_25px_rgba(0,0,0,0.1)]">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3">
+                    <p class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
+                        OncoLogic Engine v3.1
+                    </p>
+                    <span class="h-3 w-px bg-slate-700 hidden md:block"></span>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">System Live</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-sm font-medium text-slate-300">
+                        © 2026 AI-Powered Bone Tumor Detection System | 
+                        <span class="text-blue-400 font-bold ml-1 hover:text-blue-300 transition-colors cursor-default">
+                            Developed by Sashi Poorna Sivani
+                        </span>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-6 text-slate-500">
+                    <div class="flex items-center gap-1.5">
+                        <i class="ph ph-shield-check text-sm"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400">HIPAA Encrypted</span>
+                    </div>
+                    <div class="flex gap-4 border-l border-slate-700 pl-6">
+                        <i class="ph ph-github-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                        <i class="ph ph-linkedin-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <div id="loader" class="hidden fixed inset-0 bg-slate-900/80 backdrop-blur-md z-50 flex items-center justify-center text-white">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <p class="text-xl font-medium">Processing High-Fidelity Data...</p>
+            <p class="text-slate-400 text-sm mt-2">Computing weights via Gradient Boosting Model</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+
+    <script>
+        document.getElementById('analysisForm').addEventListener('submit', function() {
+            // Show the loader overlay
+            document.getElementById('loader').classList.remove('hidden');
+            
+            // Disable the button to prevent multiple clicks
+            const btn = document.getElementById('submitBtn');
+            if(btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+    </script>
+</body>
+</html>
