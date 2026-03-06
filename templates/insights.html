@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sashi AI | Prognostic Analytics</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .chart-card { background: white; border-radius: 1.5rem; border: 1px solid #f1f5f9; box-shadow: 0 4px 12px rgba(0,0,0,0.03); transition: all 0.3s ease; }
+        .chart-card:hover { box-shadow: 0 10px 20px rgba(0,0,0,0.06); transform: translateY(-2px); }
+        @media print { .no-print { display: none; } }
+    </style>
+</head>
+<body class="bg-[#f8fafc] p-6 md:p-10">
+
+    <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+        <div>
+            <div class="flex items-center gap-2 mb-2 no-print">
+                <span class="px-2 py-1 bg-blue-100 text-blue-700 text-[10px] font-bold rounded uppercase">System Active</span>
+                <span class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">v3.1 Stable</span>
+            </div>
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">Prognostic Insights Dashboard</h1>
+            <p class="text-slate-500 mt-1">Multi-dimensional neural analysis of bone tumor pathology.</p>
+        </div>
+        <div class="flex gap-3 no-print">
+            <button onclick="window.print()" class="flex items-center gap-2 bg-white border border-slate-200 px-5 py-2.5 rounded-xl font-semibold text-slate-700 hover:bg-slate-50 transition shadow-sm">
+                <i class="ph ph-file-pdf"></i> Export Report
+            </button>
+        </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        
+        <div class="lg:col-span-12 p-8 chart-card">
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="font-bold text-slate-800 text-lg">Global Feature Importance</h3>
+                    <p class="text-sm text-slate-400">Impact of specific clinical features on the neural prognosis engine.</p>
+                </div>
+                <i class="ph ph-brain text-blue-500 text-3xl"></i>
+            </div>
+            <div id="importance-chart" style="height: 350px;"></div>
+        </div>
+
+        <div class="lg:col-span-6 p-8 chart-card">
+            <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="ph ph-chart-line text-blue-500"></i> Survival Probability
+            </h3>
+            <div id="km-chart" style="height: 350px;"></div>
+        </div>
+
+        <div class="lg:col-span-6 p-8 chart-card">
+            <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="ph ph-target text-purple-500"></i> Morphological Profile
+            </h3>
+            <div id="radar-chart" style="height: 350px;"></div>
+        </div>
+
+        <div class="lg:col-span-7 p-8 chart-card">
+            <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="ph ph-git-branch text-emerald-500"></i> Patient Treatment Path Flow
+            </h3>
+            <div id="sankey-chart" style="height: 400px;"></div>
+        </div>
+
+        <div class="lg:col-span-5 p-8 chart-card">
+            <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="ph ph-squares-four text-blue-500"></i> Case Stratification
+            </h3>
+            <div id="treemap-chart" style="height: 400px;"></div>
+        </div>
+
+        <div class="lg:col-span-12 p-8 chart-card">
+            <h3 class="font-bold text-slate-800 mb-6 flex items-center gap-2">
+                <i class="ph ph-cube text-orange-500"></i> 3D Prognostic Feature Space
+            </h3>
+            <div id="3d-scatter-chart" style="height: 500px;"></div>
+        </div>
+    </div>
+
+    <script>
+        window.onload = function() {
+            const commonLayout = {
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { family: 'Plus Jakarta Sans', color: '#64748b' }
+            };
+
+           // 1. Feature Importance (Lollipop Chart)
+var importanceData = [
+    // The "Sticks" of the lollipop
+    {
+        x: [0.95, 0.82, 0.74, 0.61, 0.45, 0.30],
+        y: ['Necrosis %', 'Mitotic Rate', 'Tumor Size', 'Age', 'Grade', 'MSKCC Score'],
+        mode: 'lines',
+        line: { color: '#cbd5e1', width: 4 },
+        showlegend: false,
+        hoverinfo: 'none'
+    },
+    // The "Heads" of the lollipop
+    {
+        x: [0.95, 0.82, 0.74, 0.61, 0.45, 0.30],
+        y: ['Necrosis %', 'Mitotic Rate', 'Tumor Size', 'Age', 'Grade', 'MSKCC Score'],
+        mode: 'markers',
+        marker: {
+            color: '#2563eb',
+            size: 16,
+            line: { color: '#1e40af', width: 2 }
+        },
+        name: 'Impact Score'
+    }
+];
+
+var importanceLayout = {
+    ...commonLayout,
+    margin: { l: 120, r: 20, t: 10, b: 40 },
+    xaxis: { 
+        title: 'Relative Influence Weight', 
+        range: [0, 1.1],
+        gridcolor: '#f1f5f9'
+    },
+    yaxis: { autorange: "reversed" }, // Most important at the top
+    showlegend: false
+};
+
+Plotly.newPlot('importance-chart', importanceData, importanceLayout);
+            // 2. Survival Plot (Kaplan-Meier)
+            Plotly.newPlot('km-chart', [{
+                x: [0, 12, 24, 36, 48, 60], y: [100, 92, 85, 78, 70, 65],
+                type: 'scatter', mode: 'lines+markers',
+                line: {shape: 'hv', color: '#2563eb', width: 4},
+                marker: {size: 10, color: '#1e40af'}
+            }], { ...commonLayout, margin: {l:50, r:20, t:10, b:40}, yaxis: {title: 'Probability %', range:[0,105]} });
+
+            // 3. Radar Chart
+            Plotly.newPlot('radar-chart', [{
+                type: 'scatterpolar', r: [45, 4, 12, 8, 3],
+                theta: ['Age','Grade','Size','Mitosis','Necrosis'],
+                fill: 'toself', fillcolor: 'rgba(37,99,235,0.1)', line: {color: '#2563eb'}
+            }], { ...commonLayout, polar: { radialaxis: { visible: false } }, margin: {t:30, b:30} });
+
+           // 4. Parallel Coordinates (Patient vs. Population)
+var parallelData = [{
+  type: 'parcoords',
+  line: {
+    showscale: true,
+    colorscale: 'Jet',
+    // In a real app, 'color' would be the Survival Probability
+    color: [80, 20, 50, 90, 40, 60, 10, 75], 
+  },
+  dimensions: [{
+    range: [20, 80],
+    label: 'Age',
+    values: [25, 45, 65, 30, 55, 40, 70, 35] // Data from multiple patients
+  }, {
+    range: [1, 15],
+    label: 'Tumor Size (cm)',
+    values: [2, 8, 12, 3, 10, 5, 14, 4]
+  }, {
+    tickvals: [1, 2, 3],
+    label: 'Grade',
+    values: [1, 3, 2, 1, 3, 2, 3, 1]
+  }, {
+    range: [0, 100],
+    label: 'Survival %',
+    values: [95, 40, 60, 88, 35, 70, 15, 82]
+  }]
+}];
+
+var parallelLayout = {
+  ...commonLayout,
+  margin: { l: 80, r: 80, t: 50, b: 50 }
+};
+
+Plotly.newPlot('sankey-chart', parallelData, parallelLayout);
+
+            // 5. Treemap Chart
+            var treemapData = [{
+                type: "treemap",
+                labels: ["Bone Tumors", "Benign", "Malignant", "Grade 1", "Grade 2", "Grade 3", "Osteosarcoma", "Ewing Sarcoma"],
+                parents: ["", "Bone Tumors", "Bone Tumors", "Malignant", "Malignant", "Malignant", "Grade 3", "Grade 3"],
+                values: [100, 40, 60, 20, 20, 20, 10, 10],
+                textinfo: "label+value",
+                marker: { colorscale: 'Blues', line: { width: 1, color: '#ffffff' } }
+            }];
+            Plotly.newPlot('treemap-chart', treemapData, { ...commonLayout, margin: { l: 0, r: 0, b: 0, t: 20 } });
+
+            // 6. 3D Scatter
+            Plotly.newPlot('3d-scatter-chart', [{
+                x: [25, 45, 65, 30, 55, 40], y: [1, 3, 2, 1, 3, 2], z: [95, 40, 60, 88, 35, 70],
+                mode: 'markers', type: 'scatter3d',
+                marker: { size: 8, color: [95, 40, 60, 88, 35, 70], colorscale: 'Viridis', opacity: 0.8 }
+            }], { 
+                ...commonLayout, 
+                margin: {l:0, r:0, b:0, t:0}, 
+                scene: {
+                    xaxis:{title:'Age'}, 
+                    yaxis:{title:'Grade'}, 
+                    zaxis:{title:'Survival %'}
+                } 
+            });
+        };
+        
+    </script>
+</body>
+</html>
