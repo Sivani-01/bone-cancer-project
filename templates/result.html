@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bone Tumor Prognostic Report | OncoLogic AI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-dark: #004a7c;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .report-container {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        .report-card {
+            background: var(--card-bg);
+            width: 100%;
+            max-width: 750px;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            text-align: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .header-title {
+            color: var(--text-dark);
+            font-size: 28px;
+            font-weight: 700;
+            border-bottom: 3px solid #0ea5e9;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-table {
+            width: 100%;
+            margin-bottom: 35px;
+            text-align: left;
+            border-collapse: collapse;
+        }
+
+        .info-table td {
+            padding: 15px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 14px;
+        }
+
+        .label { font-weight: 700; color: #64748b; width: 40%; text-transform: uppercase; }
+        .value { font-weight: 600; color: #1e293b; text-align: right; }
+
+        .status-banner {
+            background-color: var(--status-color);
+            color: white;
+            padding: 24px;
+            border-radius: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        /* CLINICAL CONFIDENCE GAUGE */
+        .confidence-section {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .gauge-label-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .gauge-text { font-size: 14px; font-weight: 600; color: #334155; }
+        .gauge-value { font-size: 14px; font-weight: 700; color: #2563eb; }
+
+        .progress-container {
+            background: #e2e8f0;
+            height: 10px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: #2563eb;
+            height: 100%;
+            transition: width 1.2s ease-in-out;
+        }
+
+        .gauge-footer { font-size: 10px; color: #64748b; margin-top: 10px; }
+
+        /* BUTTONS */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+
+        .btn-primary { background: #0f172a; color: white; border: none; }
+        .btn-pdf { background: #2563eb; color: white; border: none; }
+        .btn-history { background: white; border: 1.5px solid #e2e8f0; color: #475569; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .footer-note {
+            font-size: 11px;
+            color: #94a3b8;
+            margin-top: 40px;
+            line-height: 1.6;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 25px;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white; }
+            .report-container { padding: 0; display: block; }
+            .report-card { box-shadow: none; border: 1px solid #ccc; width: 100%; max-width: 100%; }
+            .status-banner, .progress-bar { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+            footer { display: none !important; }
+        }
+    </style>
+</head>
+<body style="--status-color: {% if raw_prediction == 'D' %}#ef4444{% elif raw_prediction == 'AWD' %}#f59e0b{% else %}#10b981{% endif %};">
+
+    <div class="report-container">
+        <div class="report-card">
+            <div class="header-title">Bone Tumor Prognostic Report</div>
+
+            <table class="info-table">
+                <tr>
+                    <td class="label">Patient Name:</td>
+                    <td class="value">{{ name }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Clinical Profile:</td>
+                    <td class="value">{{ age }} Years / {{ gender }}</td>
+                </tr>
+                <tr>
+                    <td class="label">Primary STS Site:</td>
+                    <td class="value">{{ location }}</td>
+                </tr>
+            </table>
+
+            <div class="status-banner">
+                CLINICAL STATUS: {{ prediction }}
+            </div>
+
+            <div class="confidence-section">
+                <div class="gauge-label-row">
+                    <span class="gauge-text">Clinical Confidence</span>
+                    <span class="gauge-value">{{ confidence }}%</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" style="width: {{ confidence }}%;"></div>
+                </div>
+                <p class="gauge-footer">Reliability based on neural network softmax probability.</p>
+            </div>
+
+            <div class="btn-container no-print">
+                <a href="/" class="btn btn-primary">
+                    <i class="ph ph-arrow-left"></i> Analyze New
+                </a>
+                <button onclick="window.print()" class="btn btn-pdf">
+                    <i class="ph ph-file-pdf"></i> Download Report
+                </button>
+                <a href="/history" class="btn btn-history">
+                    <i class="ph ph-clock-counter-clockwise"></i> Audit Log
+                </a>
+            </div>
+
+            <div class="footer-note">
+                <strong>CONFIDENTIAL:</strong> This AI-generated prognosis is for clinical decision support only.<br>
+                Final clinical diagnosis must be confirmed by a qualified oncologist.<br>
+                Generated: {{ date }} | System ID: ANN-PRO-2026 | Dev: Sashi Poorna Sivani
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-auto bg-[#0f172a] text-slate-400 py-6 px-10 shadow-[0_-10px_25px_rgba(0,0,0,0.1)] no-print">
+        <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+            
+            <div class="flex items-center gap-3">
+                <p class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
+                    OncoLogic Engine v3.1
+                </p>
+                <span class="h-3 w-px bg-slate-700 hidden md:block"></span>
+                <div class="flex items-center gap-2">
+                    <span class="relative flex h-2 w-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                    </span>
+                    <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">System Live</span>
+                </div>
+            </div>
+
+            <div class="text-center">
+                <p class="text-sm font-medium text-slate-300">
+                    © 2026 AI-Powered Bone Tumor Detection System | 
+                    <span class="text-blue-400 font-bold ml-1 hover:text-blue-300 transition-colors cursor-default">
+                        Developed by Sashi Poorna Sivani
+                    </span>
+                </p>
+            </div>
+
+            <div class="flex items-center gap-6 text-slate-500">
+                <div class="flex items-center gap-1.5">
+                    <i class="ph ph-shield-check text-sm"></i>
+                    <span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400">HIPAA Encrypted</span>
+                </div>
+                <div class="flex gap-4 border-l border-slate-700 pl-6">
+                    <i class="ph ph-github-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                    <i class="ph ph-linkedin-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
