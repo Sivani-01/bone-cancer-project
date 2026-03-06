@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance | OncoLogic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-sidebar { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 flex h-screen overflow-hidden">
+
+    <aside class="w-72 glass-sidebar text-white p-8 flex flex-col shadow-2xl">
+        <div class="mb-12">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-600 p-2 rounded-lg"><i class="ph ph-dna text-2xl"></i></div>
+                <h1 class="text-xl font-bold tracking-tight">OncoLogic</h1>
+            </div>
+        </div>
+        <nav class="space-y-2 flex-1">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-activity text-lg"></i> Run Analysis
+            </a>
+            <a href="{{ url_for('history') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-folder-open text-lg"></i> Patient History
+            </a>
+            <a href="{{ url_for('performance') }}" class="flex items-center gap-3 p-3 rounded-xl bg-blue-600 shadow-lg text-white font-medium">
+                <i class="ph ph-chart-line-up text-lg"></i> Model Performance
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-10 overflow-y-auto flex flex-col">
+        <div class="max-w-5xl mx-auto w-full flex-1">
+            <header class="mb-10">
+                <h2 class="text-3xl font-bold text-slate-900">Model Performance Metrics</h2>
+                <p class="text-slate-500">Validation results based on {{ metrics.samples }} orthopedic oncology records.</p>
+            </header>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-4 border-blue-600">
+                    <p class="text-slate-400 text-xs font-bold uppercase mb-2">Accuracy</p>
+                    <h3 class="text-4xl font-black text-slate-800">{{ (metrics.accuracy * 100)|round(1) }}%</h3>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-4 border-indigo-600">
+                    <p class="text-slate-400 text-xs font-bold uppercase mb-2">F1 Score</p>
+                    <h3 class="text-4xl font-black text-slate-800">{{ metrics.f1 }}</h3>
+                </div>
+                <div class="bg-white p-8 rounded-3xl shadow-sm border-t-4 border-emerald-600">
+                    <p class="text-slate-400 text-xs font-bold uppercase mb-2">AUC-ROC</p>
+                    <h3 class="text-4xl font-black text-slate-800">{{ metrics.auc }}</h3>
+                </div>
+            </div>
+
+            <div class="mb-10">
+                <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i class="ph ph-database"></i> Audit Log Analytics
+                </h3>
+                <div class="grid grid-cols-3 gap-4">
+                    {% for label, count in metrics.stats.items() %}
+                    <div class="p-6 bg-white border border-slate-200 rounded-2xl shadow-sm text-center">
+                        <div class="text-xs text-slate-500 uppercase font-bold mb-1">{{ label }} Cases</div>
+                        <div class="text-3xl font-black text-slate-800">{{ count }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="bg-slate-900 rounded-3xl p-10 text-white shadow-2xl mb-12">
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                    <i class="ph ph-shield-check text-blue-400"></i> Clinical Validation Note
+                </h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    This model was trained using the <strong>Bonetumor.csv</strong> dataset. 
+                    With over 200,000 samples, we utilized a 20% test split to ensure high 
+                    generalizability across different <strong>Histological types</strong>. 
+                    The case distribution shown above reflects real-time data from your current session history.
+                </p>
+            </div>
+        </div>
+
+        <footer class="mt-auto bg-[#0f172a] text-slate-400 py-4 px-10 -mx-10 -mb-10 shadow-[0_-10px_25px_rgba(0,0,0,0.1)]">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3">
+                    <p class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
+                        OncoLogic Engine v3.1
+                    </p>
+                    <span class="h-3 w-px bg-slate-700 hidden md:block"></span>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">System Live</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-sm font-medium text-slate-300">
+                        © 2026 AI-Powered Bone Tumor Detection System | 
+                        <span class="text-blue-400 font-bold ml-1 hover:text-blue-300 transition-colors cursor-default">
+                            Developed by Sashi Poorna Sivani
+                        </span>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-6 text-slate-500">
+                    <div class="flex items-center gap-1.5">
+                        <i class="ph ph-shield-check text-sm"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400">HIPAA Encrypted</span>
+                    </div>
+                    <div class="flex gap-4 border-l border-slate-700 pl-6">
+                        <i class="ph ph-github-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                        <i class="ph ph-linkedin-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+</body>
+</html>
