@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient History | OncoLogic AI</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .glass-sidebar { background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .glass-sidebar { display: none !important; }
+            main { padding: 0 !important; width: 100% !important; }
+            body { background: white; overflow: visible; }
+            footer { display: none !important; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 flex h-screen overflow-hidden">
+
+    <aside class="w-72 glass-sidebar text-white p-8 flex flex-col shadow-2xl no-print">
+        <div class="mb-12">
+            <div class="flex items-center gap-3 mb-2">
+                <div class="bg-blue-600 p-2 rounded-lg"><i class="ph ph-dna text-2xl"></i></div>
+                <h1 class="text-xl font-bold tracking-tight">OncoLogic</h1>
+            </div>
+        </div>
+        <nav class="space-y-2 flex-1">
+            <a href="{{ url_for('index') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-activity text-lg"></i> Run Analysis
+            </a>
+            <a href="{{ url_for('history') }}" class="flex items-center gap-3 p-3 rounded-xl bg-blue-600 shadow-lg text-white font-medium">
+                <i class="ph ph-folder-open text-lg"></i> Patient History
+            </a>
+            <a href="{{ url_for('performance') }}" class="flex items-center gap-3 p-3 rounded-xl hover:bg-slate-800 transition text-slate-400">
+                <i class="ph ph-chart-line-up text-lg"></i> Model Performance
+            </a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 p-10 overflow-y-auto flex flex-col">
+        <div class="max-w-6xl mx-auto w-full flex-1">
+            <header class="mb-10 flex justify-between items-end">
+                <div>
+                    <h2 class="text-3xl font-bold text-slate-900">Patient Audit Log</h2>
+                    <p class="text-slate-500">Reviewing previous neural prognostic assessments.</p>
+                </div>
+                <a href="{{ url_for('clear_history') }}" onclick="return confirm('Clear all records?')" class="text-xs text-red-500 hover:underline no-print mb-1">
+                    Clear Audit Log
+                </a>
+            </header>
+
+            <div class="flex gap-4 mb-6 no-print">
+                <div class="relative flex-1">
+                    <i class="ph ph-magnifying-glass absolute left-3 top-3 text-slate-400"></i>
+                    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search by name or ID..." 
+                           class="w-full pl-10 p-2.5 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none bg-white shadow-sm transition">
+                </div>
+                
+                <div class="relative">
+                    <select id="statusFilter" onchange="filterTable()" 
+                            class="appearance-none pl-4 pr-10 py-2.5 border border-slate-200 rounded-xl outline-none bg-white shadow-sm focus:ring-2 focus:ring-blue-500 cursor-pointer text-slate-600">
+                        <option value="">All Statuses</option>
+                        <option value="NED">NED (No Evidence)</option>
+                        <option value="AWD">AWD (Alive with Disease)</option>
+                        <option value="D">High Risk (D)</option>
+                    </select>
+                    <i class="ph ph-caret-down absolute right-3 top-3.5 text-slate-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-12">
+                <table class="w-full text-left border-collapse" id="historyTable">
+                    <thead class="bg-slate-50 border-b border-slate-200">
+                        <tr>
+                            <th class="p-5 text-xs font-bold text-slate-500 uppercase">Patient ID</th>
+                            <th class="p-5 text-xs font-bold text-slate-500 uppercase">Name</th>
+                            <th class="p-5 text-xs font-bold text-slate-500 uppercase">Diagnosis</th>
+                            <th class="p-5 text-xs font-bold text-slate-500 uppercase">Status</th>
+                            <th class="p-5 text-xs font-bold text-slate-500 uppercase">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        {% for record in history %}
+                        <tr class="hover:bg-blue-50/30 transition">
+                            <td class="p-5 font-mono text-sm text-blue-600">{{ record.id }}</td>
+                            <td class="p-5 font-semibold text-slate-700">{{ record.name }}</td>
+                            <td class="p-5 text-sm text-slate-600">{{ record.type }}</td>
+                            <td class="p-5">
+                                <span class="px-3 py-1 rounded-full text-[10px] font-bold 
+                                    {% if record.status == 'NED' %} bg-green-100 text-green-700 
+                                    {% elif record.status == 'AWD' %} bg-yellow-100 text-yellow-700 
+                                    {% else %} bg-red-100 text-red-700 {% endif %}">
+                                    {{ record.status }}
+                                </span>
+                            </td>
+                            <td class="p-5 text-slate-400 text-sm">{{ record.date }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                
+                <div id="noResults" class="hidden p-10 text-center text-slate-400 italic">
+                    No matching records found.
+                </div>
+            </div>
+        </div>
+
+        <footer class="mt-auto bg-[#0f172a] text-slate-400 py-4 px-10 -mx-10 -mb-10 shadow-[0_-10px_25px_rgba(0,0,0,0.1)] no-print">
+            <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                
+                <div class="flex items-center gap-3">
+                    <p class="text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
+                        OncoLogic Engine v3.1
+                    </p>
+                    <span class="h-3 w-px bg-slate-700 hidden md:block"></span>
+                    <div class="flex items-center gap-2">
+                        <span class="relative flex h-2 w-2">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                        </span>
+                        <span class="text-[10px] font-bold text-emerald-500 uppercase tracking-tight">System Live</span>
+                    </div>
+                </div>
+
+                <div class="text-center">
+                    <p class="text-sm font-medium text-slate-300">
+                        © 2026 AI-Powered Bone Tumor Detection System | 
+                        <span class="text-blue-400 font-bold ml-1 hover:text-blue-300 transition-colors cursor-default">
+                            Developed by Sashi Poorna Sivani
+                        </span>
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-6 text-slate-500">
+                    <div class="flex items-center gap-1.5">
+                        <i class="ph ph-shield-check text-sm"></i>
+                        <span class="text-[10px] font-bold uppercase tracking-tighter text-slate-400">HIPAA Encrypted</span>
+                    </div>
+                    <div class="flex gap-4 border-l border-slate-700 pl-6">
+                        <i class="ph ph-github-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                        <i class="ph ph-linkedin-logo text-lg hover:text-white transition-colors cursor-pointer"></i>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </main>
+
+    <script>
+    function filterTable() {
+        let input = document.getElementById("searchInput").value.toUpperCase();
+        let status = document.getElementById("statusFilter").value.toUpperCase();
+        let rows = document.querySelectorAll("#historyTable tbody tr");
+        let noResults = document.getElementById("noResults");
+        let visibleCount = 0;
+
+        rows.forEach(row => {
+            let id = row.cells[0].textContent.toUpperCase();
+            let name = row.cells[1].textContent.toUpperCase();
+            let rowStatus = row.cells[3].textContent.toUpperCase();
+            
+            let matchesSearch = name.includes(input) || id.includes(input);
+            let matchesStatus = status === "" || rowStatus.includes(status);
+
+            if (matchesSearch && matchesStatus) {
+                row.style.display = "";
+                visibleCount++;
+            } else {
+                row.style.display = "none";
+            }
+        });
+
+        noResults.classList.toggle("hidden", visibleCount > 0);
+    }
+    </script>
+</body>
+</html>
