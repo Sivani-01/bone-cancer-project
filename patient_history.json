@@ -1,0 +1,90 @@
+[
+    {
+        "id": "STS_C006",
+        "name": "Shreya",
+        "date": "05 Mar 2026 | 22:38",
+        "type": "sclerosing epithelioid fibrosarcoma",
+        "status": "NED",
+        "confidence": 57.22
+    },
+    {
+        "id": "STS_88CE",
+        "name": "Jerry",
+        "date": "05 Mar 2026 | 22:31",
+        "type": "synovial sarcoma",
+        "status": "D",
+        "confidence": 71.12
+    },
+    {
+        "id": "STS_A624",
+        "name": "Pinnachi",
+        "date": "05 Mar 2026 | 22:30",
+        "type": "malignant solitary fibrous tumor",
+        "status": "AWD",
+        "confidence": 71.17
+    },
+    {
+        "id": "STS_6829",
+        "name": "Merina",
+        "date": "05 Mar 2026 | 22:29",
+        "type": "myxofibrosarcoma",
+        "status": "NED",
+        "confidence": 47.89
+    },
+    {
+        "id": "STS_C51F",
+        "name": "Uma Sharma",
+        "date": "05 Mar 2026 | 22:28",
+        "type": "pleomorphic sarcoma",
+        "status": "NED",
+        "confidence": 64.61
+    },
+    {
+        "id": "STS_FFB4",
+        "name": "Annanya",
+        "date": "05 Mar 2026 | 22:27",
+        "type": "sclerosing epithelioid fibrosarcoma",
+        "status": "NED",
+        "confidence": 69.63
+    },
+    {
+        "id": "STS_07F3",
+        "name": "Elena",
+        "date": "05 Mar 2026 | 22:27",
+        "type": "poorly differentiated synovial sarcoma",
+        "status": "D",
+        "confidence": 87.99
+    },
+    {
+        "id": "STS_92BB",
+        "name": "David ",
+        "date": "05 Mar 2026 | 22:23",
+        "type": "sclerosing epithelioid fibrosarcoma",
+        "status": "NED",
+        "confidence": 35.57
+    },
+    {
+        "id": "STS_F239",
+        "name": "Leo Zhang",
+        "date": "05 Mar 2026 | 22:22",
+        "type": "leiomyosarcoma",
+        "status": "NED",
+        "confidence": 63.54
+    },
+    {
+        "id": "STS_EDB9",
+        "name": "sarakhan",
+        "date": "05 Mar 2026 | 21:36",
+        "type": "pleiomorphic leiomyosarcoma",
+        "status": "NED",
+        "confidence": 68.33
+    },
+    {
+        "id": "STS_3B28",
+        "name": "Arjun Mehata",
+        "date": "05 Mar 2026 | 21:34",
+        "type": "synovial sarcoma",
+        "status": "D",
+        "confidence": 64.1
+    }
+]
